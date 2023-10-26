@@ -1,0 +1,30 @@
+name: Update application
+
+on: 
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+          - uses: actions/checkout@v4
+          - uses: actions/setup-node@v3
+          - run: |
+                git config --global user.name "Kiss Tamás"
+                git config --global user.email "kiss.tamas.j@gmail.com"
+          - run: |
+                echo '@kisstamasj:registry=https://npm.pkg.github.com/' > .npmrc
+                echo 'always-auth=true' >> .npmrc 
+                echo '//npm.pkg.github.com/:_authToken=${{ secrets.MY_PAT }}' >> .npmrc
+          - run: |
+                npm i
+                npm i @kisstamasj/my-package
+          - run: |
+                git add .
+                git commit -m "Update dependencies"
+                git push
